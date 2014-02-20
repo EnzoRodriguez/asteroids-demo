@@ -1,6 +1,8 @@
 package gameObjects 
 {
 	import assets.Assets;
+	import calculation.MovementVector;
+	import flash.geom.Point;
 	import starling.display.MovieClip;
 	import starling.events.Event
 	/**
@@ -14,7 +16,7 @@ package gameObjects
 		{
 			harmlessTime = 2;
 			this.addEventListener(Event.ADDED_TO_STAGE, init);
-			
+			maxSpeed = 200;
 		}
 		
 		private function init(e:Event):void 

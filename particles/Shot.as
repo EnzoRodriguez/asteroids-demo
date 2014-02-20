@@ -1,8 +1,9 @@
 package particles 
 {
 	import assets.Assets;
-	import calulation.MovementVector;
+	import calculation.MovementVector;
 	import flash.geom.Point;
+	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
 	import gameObjects.Unit;
 	import starling.core.Starling;
@@ -15,19 +16,17 @@ package particles
 	public class Shot extends Unit
 	{		
 		
-		public function Shot(mov:MovementVector, pos:Point) 
-		{
+		public function Shot() 
+		{	
 			harmlessTime = 0.1;
 			maxSpeed = 1000;
-			this.x = pos.x;
-			this.y = pos.y;
-			addChild(Assets.instantiateMovieClip(Assets.PARTICLE, 30));			
+		
+			addChild(Assets.instantiateMovieClip(Assets.PARTICLE, 30));					
 			
-			movement = mov;
-			var st:SoundTransform = new SoundTransform(0.3 + Math.random() * 0.7, -0.5 + Math.random());
-			var r:Number = Math.ceil(Math.random() * 2);
-			
-			Assets.playSound(Assets["SND_LASER" + r], st);
+			//sound
+			var st:SoundTransform = new SoundTransform(0.3 + Math.random() * 0.7, 1);
+			var r:Number = Math.ceil(Math.random() * 2);			
+			var c:SoundChannel = Assets.playSound(Assets["SND_LASER" + r], st,0,1);
 			
 		}		
 		

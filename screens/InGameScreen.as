@@ -1,8 +1,10 @@
 package screens 
 {
+	import assets.Assets;
+	import flash.media.SoundTransform;
 	import starling.display.Sprite;
 	import starling.events.Event;
-	import calulation.MovementVector;
+	import calculation.MovementVector;
 	import environment.Space;
 	import gameObjects.Asteroid;
 	import gameObjects.Ship;
@@ -42,6 +44,7 @@ package screens
 		private var waveTimer:Number = 0;
 		private var waveCounter:TextField;
 		private var waveNumber:Number = 1;
+		private var livesUI:LivesUI;
 		
 		public function InGameScreen() 
 		{
@@ -55,17 +58,20 @@ package screens
 			addChild(space);
 			
 			//create ship
+			
+			
 			ship = new Ship();			
+			ship.rotation = -90 / 180 * Math.PI; 
+			
 			addChild(ship);
 			ship.x = stage.stageWidth / 2;
 			ship.y = stage.stageHeight / 2;
 			ship.scaleX = ship.scaleY = 0.3;
-			ship.speedDecrease = 0.2;
+			ship.speedDecrease = 0;
 			ship.boost = 2.5;
 			ship.rotationSpeed = 200;
 			ship.maxSpeed = 20;
-			//ship.addEventListener(Unit.SHOOT, createShots);
-			
+			ship.addMoveForce(new MovementVector(ship.rotation,30));
 			
 			enemies = new Vector.<Unit>;
 			
@@ -89,7 +95,14 @@ package screens
 			waveCounter.y = stage.stageHeight / 2 - waveCounter.height / 2;
 			waveCounter.hAlign = VAlign.CENTER;
 			
+			//lives user interface
+			livesUI = new LivesUI(ship.livesLeft = 5);
+			addChild(livesUI);
+			
 			this.addEventListener(EnterFrameEvent.ENTER_FRAME, loop);
+			
+			Assets.playSound(Assets.SND_LASER2, new SoundTransform());
+			
 		}
 		private function loop(e:EnterFrameEvent):void 
 		{
@@ -160,7 +173,8 @@ package screens
 						if (enemy.checkCollisionWith(ship))
 						{
 							//trace("collide with ship");
-							enemy.toRemove = true;							
+							enemy.toRemove = true;
+							enemy.isHarmless = true;
 							ship.toRemove = true;
 							
 						}
@@ -173,18 +187,23 @@ package screens
 					enemy.explode();
 				}
 			}
-			//trace("enemies.length" +enemies.length);
 			space.update(pt);
 			
-			//wait for enabling shots
 			if (ship != null) {
 				if (ship.toRemove)
 				{
-					
-					ship.removeEventListener(Unit.SHOOT, createShots);
-					ship.explode();
-					ship = null;
-					time = 0;
+					if (ship.livesLeft > 1)
+					{
+						livesUI.lives = ship.livesLeft -= 1;
+						ship.toRemove = false;
+					}else
+					{
+						livesUI.lives = ship.livesLeft -= 1;
+						ship.removeEventListener(Unit.SHOOT, createShots);
+						ship.explode();
+						ship = null;
+						time = 0;
+					}
 					
 				}
 				if (time < 0.5)
@@ -209,10 +228,16 @@ package screens
 		{		
 			switch(e.data)
 			{
-				case "single":					
- 					var shot:Shot = new Shot(new MovementVector(ship.rotation, 500), new Point(ship.x,ship.y));					
+				case "single":		
+					trace("shoot");
+					var shot:Shot = new Shot();					
 					playerShots.push(shot);
 					addChild(shot);
+					
+					trace("ship.rotation " + ship.rotation);
+					shot.addMoveForce(new MovementVector(ship.rotation, 600));
+					shot.x = ship.x;
+					shot.y = ship.y;
 					break;
 			}
 		}

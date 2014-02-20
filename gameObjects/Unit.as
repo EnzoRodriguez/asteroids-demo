@@ -1,7 +1,8 @@
 package gameObjects 
 {
 	import assets.Assets;
-	import calulation.MovementVector;
+	import calculation.MovementVector;
+	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
 	import starling.display.MovieClip;
 	import starling.display.Sprite;
@@ -15,12 +16,12 @@ package gameObjects
 	public class Unit extends Sprite
 	{
 		static public const SHOOT:String = "shoot";
-		public var movement:MovementVector = new MovementVector(0,0);
+		public var movement:MovementVector;
 		private var rotSpeed:Number = 0;
 		private var pt:Number = 0;
 		private var time:Number = 0;
 		public var speedDecrease:Number = 0;
-		public var maxSpeed:Number = 10;
+		public var maxSpeed:Number = 100;
 		public var boost:Number = 2;
 		public var harmlessTime:Number = 0.5;
 		private var explosion:MovieClip;
@@ -29,7 +30,7 @@ package gameObjects
 		public var toRemove:Boolean = false;
 		
 		public function Unit() 
-		{
+		{			
 			this.addEventListener(Event.ADDED_TO_STAGE, init);
 		}
 		public function set isHarmless(b:Boolean):void
@@ -39,12 +40,9 @@ package gameObjects
 		public function get isHarmless():Boolean
 		{
 			return harmless;
-		}
-		
-		
+		}	
 		private function init(e:Event):void 
-		{
-		
+		{		
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 		
 			this.pivotX = this.width / 2;
@@ -61,21 +59,19 @@ package gameObjects
 		public function teleport():void
 		{	
 			//teleport mechanic
+			if (this.x > stage.stageWidth + this.width) this.x = -this.width + 1;
+			if (this.x < - this.width) this.x = stage.stageWidth + this.width -1;
+			if (this.y > stage.stageHeight + this.width) this.y = -this.height + 1;
+			if (this.y < - this.width) this.y = stage.stageHeight + this.height - 1;		
 			
-			
-			if (stage != null)
-			{
-   			if (this.x > stage.stageWidth + this.width) this.x = -this.width;
-			if (this.x < - this.width) this.x = stage.stageWidth + this.width;
-			if (this.y > stage.stageHeight + this.width) this.y = -this.width;
-			if (this.y < - this.width) this.y = stage.stageHeight + this.width;		
-			}else
-			{
-				//trace(this + "still in vector");
-			}
 		}
 		public function addMoveForce(mVec:MovementVector):void
 		{
+			
+			if (movement == null)
+			{
+				movement = new MovementVector(this.rotation, 0);
+			}
 			//add force to movement vector
 			movement.xFactor += mVec.xFactor;
 			movement.yFactor += mVec.yFactor;
@@ -94,26 +90,31 @@ package gameObjects
 		
 		private function move():void
 		{
-			//movement			
+			//movement
+			
+		
 			if (movement.speed > maxSpeed) movement.speed = maxSpeed;				
 			this.x += movement.xFactor * movement.speed * pt;
 			this.y += movement.yFactor * movement.speed * pt;
-			
-			if (movement.speed > 0) 
-			{ 
-				
-				movement.speed -= speedDecrease;
-			}
-			else
+						
+			if (Root.DEVICE_TYPE == Root.KEY_DEVICE)
 			{
-				movement.xFactor = 0;
-				movement.yFactor = 0;
+				if (movement.speed > 0) 
+				{ 					
+					movement.speed -= speedDecrease;
+				}
+				else
+				{
+					movement.xFactor = 0;
+					movement.yFactor = 0;
+				}
 			}
-			
 		}
 		public function rotate(spd:Number):void
 		{
-			//rotate mechanic		
+			//rotate mechanic	
+			
+			trace("rotationspeed" + rotSpeed);
 			rotSpeed = spd;						
 		}
 		
@@ -155,8 +156,20 @@ package gameObjects
 			}
 			
 			
-			this.rotation += rotSpeed / 180 * Math.PI * passedTime;  //rotSpeed is in graden per seconde, dat wordt hier omgezet in radians per frame
-			move();			
+			var rotRad:Number = rotSpeed / 180 * Math.PI * passedTime;
+			this.rotation += rotRad  //rotSpeed is in graden per seconde, dat wordt hier omgezet in radians per frame
+			
+			
+			if (rotSpeed > 0) rotSpeed--;
+			
+			//trace(this.rotation + " update rotation");
+			
+			if(movement!=null){
+				
+				move();			
+			}
+			
+						
 			teleport();
 			
 			
@@ -186,7 +199,7 @@ package gameObjects
 			explosion.addEventListener(Event.COMPLETE, destroy);
 			
 			var r:int = Math.ceil(Math.random() * 2);
-			Assets.playSound(Assets["SND_EXPLODE" + r],new SoundTransform(this.scaleX));
+			var c:SoundChannel = Assets.playSound(Assets["SND_EXPLODE" + r],new SoundTransform(this.scaleX),0,1);
 			
 			
 		}

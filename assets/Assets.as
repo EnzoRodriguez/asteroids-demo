@@ -31,23 +31,22 @@ package assets
 		public static const SND_LASER2:String = "laser2";
 		public static const SND_EXPLODE1:String = "explode1";
 		public static const SND_EXPLODE2:String = "explode2";
+		public static const SND_LOOP:String = "loop";
 
 		
 		public static const ASSETS_LOADED:String = "loaded";
 		public static var dispatcher:EventDispatcher = new EventDispatcher();
-		private static var assetsManager:AssetManager = new AssetManager();
+		private static var assetsManager:AssetManager = new AssetManager();	
+	
 		
 		public static function loadAssets():void 
 		{			
-			assetsManager.enqueue(EmbeddedAssets);
-		
+			assetsManager.enqueue(EmbeddedAssets);		
 			var directory:File = File.applicationDirectory;
-			assetsManager.enqueue(directory.resolvePath("assets"));
-			
+			assetsManager.enqueue(directory.resolvePath("assets"));			
 			assetsManager.loadQueue(
 				function (ratio:Number):void
-				{
-					
+				{					
 					if (ratio == 1)
 					{						
 						dispatcher.dispatchEvent(new Event(ASSETS_LOADED));
@@ -69,12 +68,11 @@ package assets
 		{
 			return assetsManager.getTexture(name);		
 		}
-		public static function playSound(name:String, st:SoundTransform):void
-		{
-			assetsManager.playSound(name, 0, 1, st);
+		public static function playSound(name:String, st:SoundTransform, sTime:int = 0, loops = 1):SoundChannel
+		{			
+			return assetsManager.playSound(name, sTime, loops, st);		
 		}
-		
-		
+				
 	}
 
 }

@@ -1,6 +1,7 @@
 package  
 {
 	
+	import controllers.TouchController;
 	import screens.Screen;
 	import starling.display.Sprite;
 	import screens.InGameScreen;
@@ -24,19 +25,21 @@ package
 	 */
 	public class Root extends Sprite
 	{
+		
+		public static var DEVICE_TYPE:String;
+		public static const TOUCH_DEVICE:String = "touch";
+		public static const KEY_DEVICE:String = "key";
+		
 		private var startScreen:StartScreen;
 		private var inGameScreen:InGameScreen;
-		
+		private var touchController:TouchController;
 	
 		private var screen:Screen;
 		public function Root():void
 		{
-			
-						
-			
 			Assets.loadAssets();
 			Assets.dispatcher.addEventListener(Assets.ASSETS_LOADED, done);
-			
+						
 		}	
 		private function placeScreen(type:String):void
 		{
@@ -60,8 +63,8 @@ package
 		{	
 			
 			placeScreen("start");					
-			
-		}				
+			touchController = new TouchController(stage);
+		}
 		private function startGame(e:Event):void 
 		{
 			screen.destroy();

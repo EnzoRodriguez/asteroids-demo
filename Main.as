@@ -7,13 +7,15 @@ package
 	import flash.display.StageScaleMode;
 	import flash.ui.Multitouch;
 	import flash.ui.MultitouchInputMode;
-	import net.hires.debug.Stats;
+	
 
 	import starling.core.Starling;
 	/**
 	 * ...
 	 * @author erwin henraat
 	 */
+	
+	
 	public class Main extends Sprite 
 	{
 		private var starling:Starling;
@@ -24,6 +26,13 @@ package
 			stage.align = StageAlign.TOP_LEFT;
 			stage.addEventListener(Event.DEACTIVATE, deactivate);
 			
+			//var totalWidth:Number = stage.stageWidth;
+			//var totalHeight:Number = stage.stageHeight;
+			
+			//var scaleFactor:Number = 1
+			
+			
+			
 			// touch or gesture?
 			Multitouch.inputMode = MultitouchInputMode.TOUCH_POINT;
 			
@@ -31,9 +40,7 @@ package
 			starling = new Starling(Root, stage);
 			starling.start();
 			
-			var s:Stats = new Stats();
 			
-			addChild(s);
 			
 			// new to AIR? please read *carefully* the readme.txt files!
 		}
@@ -41,7 +48,7 @@ package
 		private function deactivate(e:Event):void 
 		{
 			// make sure the app behaves well (or exits) when in background
-			//NativeApplication.nativeApplication.exit();
+			NativeApplication.nativeApplication.exit();
 		}
 		
 	}

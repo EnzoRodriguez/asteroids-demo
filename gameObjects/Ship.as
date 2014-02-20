@@ -1,7 +1,7 @@
 package gameObjects 
 {
 	import assets.Assets;
-	import calulation.MovementVector;
+	import calculation.MovementVector;
 	import flash.geom.Point;
 	import starling.core.Starling;
 	import starling.display.MovieClip;
@@ -9,6 +9,7 @@ package gameObjects
 	import starling.events.Event;
 	import starling.events.KeyboardEvent;
 	import flash.ui.Keyboard;
+	import controllers.TouchController;
 	/**
 	 * ...
 	 * @author erwin henraat
@@ -25,12 +26,19 @@ package gameObjects
 		private var cooldown:Number = 0;
 		private var accelerate:Boolean = false;
 		private var braking:Boolean = false;
+		private var lives:int = 5;
 		public var rotationSpeed:Number = 180;
 		
-		
-		public function Ship() 
+		public function get livesLeft():int
 		{
-			this.rotation = -90 / 180 * Math.PI;			
+			return lives;
+		}
+		public function set livesLeft(num:int):void
+		{
+			lives = num;
+		}
+		public function Ship() 
+		{						
 			harmlessTime = 2;
 			idleAnimation = Assets.instantiateMovieClip(Assets.SHIP_IDLE);
 			moveAnimation = Assets.instantiateMovieClip(Assets.SHIP_MOVE);
@@ -39,6 +47,9 @@ package gameObjects
 			idleAnimation.play();
 			moveAnimation.play();
 			moveAnimation.visible = false;		
+			
+			//addMoveForce(new MovementVector(this.rotation, 500))
+			
 			this.addEventListener(Event.ADDED_TO_STAGE, init);
 			
 		}		
@@ -47,6 +58,22 @@ package gameObjects
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, kDown);
 			stage.addEventListener(KeyboardEvent.KEY_UP, kUp);
+			stage.addEventListener(TouchController.TAP, onTap);
+			stage.addEventListener(TouchController.SWIPE, onSwipe);
+		}
+		
+		private function onSwipe(e:Event):void 
+		{
+			
+			var strength:Number = Number(e.data);
+			//trace("strength : " + strength);
+			
+			rotate(rotationSpeed * strength / 50);
+		}
+		
+		private function onTap(e:Event):void 
+		{
+			dispatchEventWith(SHOOT, false, "single");
 		}
 		
 		private function kDown(e:KeyboardEvent):void 
@@ -93,8 +120,8 @@ package gameObjects
 			}
 		}				
 		public override function update(passedTime:Number):void
-		{
-			trace(speedDecrease);
+		{			
+			
 			
 			if (accelerate) addMoveForce(new MovementVector(this.rotation, boost));
 			if (braking) brake(1);
@@ -106,29 +133,49 @@ package gameObjects
 		
 		private function animate():void 
 		{
-			if (movement.speed > 5)
+			if (movement == null)
 			{
-				if (idleAnimation.visible)
+				idleAnimation.visible = true;
+				moveAnimation.visible = false;
+			
+				
+			}else
+			{
+				if (movement.speed > 5)
 				{
-					idleAnimation.visible = false;
-					moveAnimation.visible = true;
+					if (idleAnimation.visible)
+					{
+						idleAnimation.visible = false;
+						moveAnimation.visible = true;
+					}
+				}
+				else
+				{
+					if (!idleAnimation.visible)
+					{
+						idleAnimation.visible = true;
+						moveAnimation.visible = false;
+					}
 				}
 			}
-			else
-			{
-				if (!idleAnimation.visible)
-				{
-					idleAnimation.visible = true;
-					moveAnimation.visible = false;
-				}
-			}
+			
+			
 		}
 		public override function explode():void
 		{
-			stage.addEventListener(KeyboardEvent.KEY_DOWN, kDown);
-			stage.addEventListener(KeyboardEvent.KEY_UP, kUp);
+			if (lives > 0)
+			{
+				lives--;
+			}
+			else
+			{
+				stage.removeEventListener(KeyboardEvent.KEY_DOWN, kDown);
+				stage.removeEventListener(KeyboardEvent.KEY_UP, kUp);
 			
-			super.explode();
+				super.explode();
+			}
+			
+			
 			
 		}
 		

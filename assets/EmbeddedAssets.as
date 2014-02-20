@@ -6,6 +6,7 @@ package assets
 	 */
 	public class EmbeddedAssets 
 	{
+		
 		[Embed(source = "../../bin/assets/space_background_1.png")]
 		public static const spaceLayer1:Class;
 		[Embed(source = "../../bin/assets/space_background_2.png")]

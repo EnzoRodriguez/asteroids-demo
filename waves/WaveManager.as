@@ -1,6 +1,6 @@
 package waves 
 {
-	import calulation.MovementVector;
+	import calculation.MovementVector;
 	import flash.geom.Point;
 	import gameObjects.Asteroid;
 	import gameObjects.Unit;
@@ -68,7 +68,7 @@ package waves
 			asteroid.visible = false;
 			
 			
-		}		
+		}			
 		public function createWave(total:Number):void
 		{
 			var poolSize:int = pool.length;
@@ -85,24 +85,18 @@ package waves
 				newWave.push(popped);
 			}
 			for (i = 0; i < total-numFromPool; i++) 
-			{
+			{				
 				var fresh:Unit = new Asteroid();
 				_targetSprite.addChild(fresh);
 				newWave.push(fresh);				
 			}
 			for each(var asteroid:Asteroid in newWave)
 			{
-				_targetVector.push(asteroid);
+				_targetVector.push(asteroid);				
+				asteroid.scaleX = asteroid.scaleY = 0.2 + Math.random() * 0.3;				
 				asteroid.x = Math.random() * _stageSize.x;
 				asteroid.y = Math.random() * _stageSize.y;
-				
-				asteroid.scaleX = asteroid.scaleY = 0.2 + Math.random() * 0.3;
-				
-				var speed:Number =  10000 + Math.random() * 5000;
-				var rot:Number = Math.PI * Math.random();
-				
-				asteroid.addMoveForce(new MovementVector(rot, speed));
-				
+				asteroid.addMoveForce(new MovementVector(Math.random() * Math.PI, 30 + Math.random() * 40));
 
 			}
 			
